@@ -28,7 +28,13 @@ class Program:
   def clear_screen(self):
     print("\033[2J")
   def update_cursor(self):
-    print("\033[H" + "\033["+str(self.cursorpos[1])+";"+str(self.cursorpos[0])+"H", end="", flush=True)
+    text = "\033[H" + "\033["+str(self.cursorpos[1])+";"+str(self.cursorpos[0])+"H"
+    match self.mode:
+      case 0:
+        text += "\033[?16;0;0;c"
+      case _:
+        text += "\033[?5;0;0;c"
+    print(text, end="", flush=True)
     #print(f"\033[{str(self.cursorpos[0])}G")
   def render_text(self):
     termsize = os.get_terminal_size()
@@ -55,8 +61,32 @@ class Program:
     return self.cursorpos
 
   def type_text(self, text):
-    self.lines[self.cursorpos[1]-2] = self.lines[self.cursorpos[1]-2][:self.cursorpos[0]-1] + text + self.lines[self.cursorpos[1]-2][self.cursorpos[0]-1:]
-    self.move_cursor((len(text),0))
+    match text:
+      case "SPECIALKEY_BACKSPACE":
+        if self.cursorpos[0]>1:
+          self.lines[self.cursorpos[1]-2] = self.lines[self.cursorpos[1]-2][:self.cursorpos[0]-2] + self.lines[self.cursorpos[1]-2][self.cursorpos[0]-1:]
+          self.move_cursor((-1,0))
+        else:
+          pre_lines = self.lines[:self.cursorpos[1]-3]
+          ln = len(self.lines[self.cursorpos[1]-3][:-1])
+          pre_lines.append(self.lines[self.cursorpos[1]-3][:-1] + self.lines[self.cursorpos[1]-2])
+          pre_lines += self.lines[self.cursorpos[1]-1:]
+          self.lines = pre_lines
+          self.move_cursor((ln,-1))
+
+
+      case "\n":
+        pre_lines = self.lines[:self.cursorpos[1]-2]
+        pre_lines.append(self.lines[self.cursorpos[1]-2][:self.cursorpos[0]-1]+"\n")
+        post_lines = [self.lines[self.cursorpos[1]-2][self.cursorpos[0]-1:]]
+        post_lines += self.lines[self.cursorpos[1]-1:]
+        self.lines = pre_lines
+        #self.lines.append("\n")
+        self.lines+=post_lines
+        self.move_cursor((-9999,1))
+      case _:
+        self.lines[self.cursorpos[1]-2] = self.lines[self.cursorpos[1]-2][:self.cursorpos[0]-1] + text + self.lines[self.cursorpos[1]-2][self.cursorpos[0]-1:]
+        self.move_cursor((len(text),0))
 
 
 if len(sys.argv)>1:
