@@ -62,7 +62,7 @@ class Program:
 
   def type_text(self, text):
     match text:
-      case "SPECIALKEY_BACKSPACE":
+      case "":
         if self.cursorpos[0]>1:
           self.lines[self.cursorpos[1]-2] = self.lines[self.cursorpos[1]-2][:self.cursorpos[0]-2] + self.lines[self.cursorpos[1]-2][self.cursorpos[0]-1:]
           self.move_cursor((-1,0))
@@ -148,12 +148,12 @@ if len(sys.argv)>1:
               program.io += "i"
             case 2:
               program.type_text("i")
-        case '':
-          match program.mode:
-            case 1:
-              program.io = program.io[:-1]
-            case 2:
-              program.type_text("SPECIALKEY_BACKSPACE")
+        #case '':
+        #  match program.mode:
+        #    case 1:
+        #      program.io = program.io[:-1]
+        #    case 2:
+        #      program.type_text("SPECIALKEY_BACKSPACE")
         case _:
           match program.mode:
             case 0:
