@@ -12,7 +12,7 @@ modes = {"control": 0, "command": 1, "input": 2}
 
 class Program:
   def __init__(self):
-    self.cursorpos = (1,1)
+    self.cursorpos = (1,2)
     self.lines = []
     self.io = ""
     self.filename = ""
@@ -20,8 +20,11 @@ class Program:
     self.display = ""
   def read_file(self, filename):
     self.filename = filename
-    with open(filename, "r") as f:
-      self.lines = f.readlines()
+    try:
+      with open(filename, "r") as f:
+        self.lines = f.readlines()
+    except FileNotFoundError:
+      self.lines = [""]
   def write_file(self, filename):
     with open(filename, "w") as f:
       f.write(''.join(self.lines))
@@ -43,12 +46,14 @@ class Program:
       self.display+=i
     for i in range(termsize.lines - len(self.display.split("\n"))-2):
       self.display += "\n"
-    self.display += "\033[48;2;160;0;120m" + self.io + (termsize.columns-len(self.io)-1)*" " + str(self.mode) + "\033[0m";
+    self.display += "\033[48;2;160;0;120m" + self.io + (termsize.columns-len(self.io)-4 - len(str(self.cursorpos[0])) - len(str(self.cursorpos[1])))*" " + str(self.cursorpos[0]) + "," + str(self.cursorpos[1]) + ": " + str(self.mode) + "\033[0m";
     print("\033[2J\033[H" + self.display)
 
 
   def move_cursor(self, vec):
-    self.cursorpos = (self.cursorpos[0] + vec[0], self.cursorpos[1] + vec[1])
+    self.cursorpos = (max(1, min(self.cursorpos[0] + vec[0], len(self.lines[self.cursorpos[1]-2]))), max(1, min(self.cursorpos[1] + vec[1], len(self.lines)+1)))
+
+    '''self.cursorpos = (self.cursorpos[0] + vec[0], self.cursorpos[1] + vec[1])
     if self.cursorpos[1]<1:
       self.cursorpos = (self.cursorpos[0], 1)
     elif self.cursorpos[1]>len(self.lines):
@@ -57,7 +62,7 @@ class Program:
     if self.cursorpos[0]<1:
       self.cursorpos = (1, self.cursorpos[1])
     elif self.cursorpos[0]>len(self.lines[self.cursorpos[1]-2]):
-      self.cursorpos = (len(self.lines[self.cursorpos[1]-2]), self.cursorpos[1])
+      self.cursorpos = (len(self.lines[self.cursorpos[1]-2]), self.cursorpos[1])'''
     return self.cursorpos
 
   def type_text(self, text):
@@ -148,12 +153,12 @@ if len(sys.argv)>1:
               program.io += "i"
             case 2:
               program.type_text("i")
-        #case '':
-        #  match program.mode:
-        #    case 1:
-        #      program.io = program.io[:-1]
-        #    case 2:
-        #      program.type_text("SPECIALKEY_BACKSPACE")
+        case '':
+          match program.mode:
+            case 1:
+              program.io = program.io[:-1]
+            case 2:
+              program.type_text('')
         case _:
           match program.mode:
             case 0:
