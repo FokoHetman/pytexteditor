@@ -1,7 +1,10 @@
-import core.getch
+def dajta():
+  x = 2
+  y = 7
+  z = x*y**(1/2)
+  return [x,y,z]
 
-getch = core.getch._Getch()
-while True:
-  getch()
-  print("\033[2J\033[2;2H hell")
-
+#lista = dajta()
+#x = lista[2]
+x,y,z = dajta()
+print(x)

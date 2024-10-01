@@ -51,18 +51,21 @@ class Program:
 
 
   def move_cursor(self, vec):
-    self.cursorpos = (max(1, min(self.cursorpos[0] + vec[0], len(self.lines[self.cursorpos[1]-2]))), max(1, min(self.cursorpos[1] + vec[1], len(self.lines)+1)))
+    '''if len(self.lines)>(self.cursorpos[1]-1):
+      self.cursorpos = (max(1, min(self.cursorpos[0] + vec[0], len(self.lines[self.cursorpos[1]-1]))), max(1, min(self.cursorpos[1] + vec[1], len(self.lines)+1)))
+    else:
+      self.cursorpos = (max(1, min(self.cursorpos[0] + vec[0], 0)), max(1, min(self.cursorpos[1] + vec[1], len(self.lines)+1)))'''
 
-    '''self.cursorpos = (self.cursorpos[0] + vec[0], self.cursorpos[1] + vec[1])
-    if self.cursorpos[1]<1:
-      self.cursorpos = (self.cursorpos[0], 1)
+    self.cursorpos = (self.cursorpos[0] + vec[0], self.cursorpos[1] + vec[1])
+    if self.cursorpos[1]<2:
+      self.cursorpos = (self.cursorpos[0], 2)
     elif self.cursorpos[1]>len(self.lines):
-      self.cursorpos = (self.cursorpos[0], len(self.lines))
+      self.cursorpos = (self.cursorpos[0], len(self.lines)+1)
 
     if self.cursorpos[0]<1:
       self.cursorpos = (1, self.cursorpos[1])
     elif self.cursorpos[0]>len(self.lines[self.cursorpos[1]-2]):
-      self.cursorpos = (len(self.lines[self.cursorpos[1]-2]), self.cursorpos[1])'''
+      self.cursorpos = (len(self.lines[self.cursorpos[1]-2]), self.cursorpos[1])
     return self.cursorpos
 
   def type_text(self, text):
